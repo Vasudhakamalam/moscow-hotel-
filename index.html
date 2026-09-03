@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moscow Hotel | Stay. Dine. Relax.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="navbar">
+  <a class="logo" href="#">MOSCOW<span>HOTEL</span></a>
+  <nav><a href="#rooms">Rooms</a><a href="#restaurant">Restaurant</a><a href="#booking">Book Now</a></nav>
+  <a class="nav-btn" href="#booking">Reserve a Room</a>
+</header>
+<main>
+<section class="hero"><div class="hero-overlay"></div><div class="hero-content">
+  <p class="eyebrow">WELCOME TO MOSCOW HOTEL</p><h1>Stay beautifully.<br><em>Live comfortably.</em></h1>
+  <p class="hero-text">A refined stay with thoughtfully designed rooms, memorable dining and warm hospitality.</p>
+  <div class="hero-actions"><a class="btn primary" href="#booking">Book Your Stay</a><a class="btn ghost" href="#rooms">Explore Rooms</a></div>
+</div></section>
+<section class="intro section"><div><p class="eyebrow">THE MOSCOW EXPERIENCE</p><h2>Comfort with a touch of elegance.</h2></div><p>From restful rooms to delicious dining, Moscow Hotel is designed for business trips, family holidays and peaceful weekend escapes.</p></section>
+<section id="rooms" class="section"><div class="section-heading"><div><p class="eyebrow">OUR ROOMS</p><h2>Find your perfect stay</h2></div><p>Choose from our carefully designed rooms and suites.</p></div>
+<div class="room-grid">{% for room in rooms %}<article class="room-card"><div class="image-wrap"><img src="{{ room.image }}" alt="{{ room.name }}"></div><div class="room-info">
+<div class="room-top"><h3>{{ room.name }}</h3><strong>₹{{ "{:,}".format(room.price) }}<small>/night</small></strong></div><p>{{ room.description }}</p>
+<button class="text-btn select-room" data-room="{{ room.name }}">Book this room <span>→</span></button></div></article>{% endfor %}</div></section>
+<section id="restaurant" class="section restaurant"><div class="section-heading"><div><p class="eyebrow">MOSCOW RESTAURANT</p><h2>Our menu</h2></div><p>Fresh ingredients, comforting classics and signature dishes.</p></div>
+<div class="menu-grid">{% for item in menu %}<div class="menu-item"><div><span class="category">{{ item.category }}</span><h3>{{ item.name }}</h3><p>{{ item.description }}</p></div><strong>₹{{ item.price }}</strong></div>{% endfor %}</div></section>
+<section id="booking" class="booking-section"><div class="booking-copy"><p class="eyebrow">ROOM RESERVATION</p><h2>Make your stay memorable.</h2><p>Fill in your details and our team will confirm your reservation.</p><div class="contact-mini"><span>24/7</span><div><b>Guest support</b><small>Always here to help</small></div></div></div>
+<form class="booking-form" method="POST" action="{{ url_for('book') }}">
+<div class="form-row"><label>Full name<input name="guest_name" required placeholder="Your name"></label><label>Email<input type="email" name="email" required placeholder="you@example.com"></label></div>
+<div class="form-row"><label>Phone<input name="phone" required placeholder="+91 98765 43210"></label><label>Room<select id="room_name" name="room_name" required><option value="">Select a room</option>{% for room in rooms %}<option>{{ room.name }}</option>{% endfor %}</select></label></div>
+<div class="form-row"><label>Check-in<input type="date" name="check_in" required></label><label>Check-out<input type="date" name="check_out" required></label></div>
+<label>Guests<input type="number" name="guests" min="1" max="10" value="1" required></label>
+<button class="btn primary full" type="submit">Confirm Booking Request</button>
+{% with messages = get_flashed_messages() %}{% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}{% endwith %}
+</form></section>
+</main>
+<footer><div class="logo">MOSCOW<span>HOTEL</span></div><p>© 2026 Moscow Hotel. Crafted for comfortable stays.</p></footer>
+<script>
+document.querySelectorAll(".select-room").forEach(btn=>btn.addEventListener("click",()=>{document.getElementById("room_name").value=btn.dataset.room;document.getElementById("booking").scrollIntoView({behavior:"smooth"})}));
+const today=new Date().toISOString().split("T")[0];document.querySelectorAll('input[type="date"]').forEach(i=>i.min=today);
+</script>
+</body></html>

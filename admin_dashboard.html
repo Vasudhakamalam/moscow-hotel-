@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Moscow Hotel | Admin Dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body class="admin-page"><header class="navbar"><a class="logo" href="{{ url_for('home') }}">MOSCOW<span>HOTEL</span></a><div class="admin-nav"><span>Admin: {{ session.get('admin_username') }}</span><a class="nav-btn" href="{{ url_for('admin_logout') }}">Log out</a></div></header>
+<section class="section admin-dashboard"><div class="dashboard-head"><div><p class="eyebrow">PRIVATE ADMIN AREA</p><h1>Booking Dashboard</h1><p class="muted">Guest booking information is visible only after administrator authentication.</p></div></div>
+<div class="stats"><div><small>Total bookings</small><strong>{{ total }}</strong></div><div><small>Check-ins today</small><strong>{{ checkins_today }}</strong></div><div><small>Upcoming bookings</small><strong>{{ upcoming }}</strong></div></div>
+<div class="table-wrap"><table><thead><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Guests</th><th>Contact</th><th>Booked at</th></tr></thead><tbody>
+{% for b in bookings %}<tr><td><strong>{{ b.guest_name }}</strong></td><td>{{ b.room_name }}</td><td>{{ b.check_in }} → {{ b.check_out }}</td><td>{{ b.guests }}</td><td>{{ b.email }}<br>{{ b.phone }}</td><td>{{ b.created_at }}</td></tr>{% else %}<tr><td colspan="6">No bookings yet.</td></tr>{% endfor %}
+</tbody></table></div></section></body></html>

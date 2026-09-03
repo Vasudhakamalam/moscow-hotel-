@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Moscow Hotel | Admin Login</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body class="admin-page"><div class="login-card"><a class="logo" href="{{ url_for('home') }}">MOSCOW<span>HOTEL</span></a><p class="eyebrow">PRIVATE AREA</p><h1>Administrator Login</h1><p class="muted">Only authorized hotel staff can access booking information.</p>
+<form method="POST"><label>Username<input name="username" required autocomplete="username"></label><label>Password<input type="password" name="password" required autocomplete="current-password"></label><button class="btn primary full" type="submit">Sign In</button></form>
+{% with messages=get_flashed_messages() %}{% if messages %}<div class="flash error">{{ messages[0] }}</div>{% endif %}{% endwith %}<a class="back-link" href="{{ url_for('home') }}">← Back to hotel website</a></div></body></html>
