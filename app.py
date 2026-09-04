@@ -160,7 +160,6 @@ def admin_dashboard():
 @admin_required
 def bookings():
     return redirect(url_for("admin_dashboard"))
-
+init_db()
 if __name__ == "__main__":
-    init_db()
     app.run(host="0.0.0.0", port=5000, debug=True)
