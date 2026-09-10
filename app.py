@@ -1,5 +1,7 @@
 import os
 import sqlite3
+import smtplib
+from email.message import EmailMessage
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -14,8 +16,50 @@ DB_PATH = BASE_DIR / "moscow_hotel.db"
 
 # Demo defaults. For deployment, set ADMIN_USERNAME, ADMIN_PASSWORD and SECRET_KEY
 # as environment variables on your hosting platform.
-ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Moscow@123")
+def send_booking_email(guest_name, guest_email, room_name, check_in, check_out, guests):
+    """Send an automatic booking confirmation/welcome email."""
+    mail_server = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    mail_port = int(os.environ.get("MAIL_PORT", "587"))
+    mail_username = os.environ.get("MAIL_USERNAME")
+    mail_password = os.environ.get("MAIL_PASSWORD")
+
+    if not mail_username or not mail_password:
+        print("Email settings are not configured.")
+        return
+
+    message = EmailMessage()
+    message["Subject"] = f"Welcome to Moscow Hotel, {guest_name}!"
+    message["From"] = mail_username
+    message["To"] = guest_email
+
+    message.set_content(f"""
+Dear {guest_name},
+
+Thank you for booking your stay with Moscow Hotel, Madurai!
+
+Your booking details:
+
+Room: {room_name}
+Check-in: {check_in}
+Check-out: {check_out}
+Guests: {guests}
+
+We are happy to welcome you and look forward to your stay.
+
+Warm regards,
+Moscow Hotel Team
+""")
+
+    try:
+        with smtplib.SMTP(mail_server, mail_port) as server:
+            server.starttls()
+            server.login(mail_username, mail_password)
+            server.send_message(message)
+
+        print(f"Booking email sent successfully to {guest_email}")
+
+    except Exception as error:
+        print(f"Could not send booking email: {error}")
 
 ROOMS = [
     {"id": 1, "name": "Deluxe Room", "price": 4500, "image": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&q=80", "description": "Elegant room with a king bed, workspace and city view."},
@@ -111,6 +155,16 @@ def book():
     )
     conn.commit()
     conn.close()
+
+    # Automatically send a personalized welcome email
+    send_booking_email(
+        guest_name,
+        email,
+        room_name,
+        check_in,
+        check_out,
+        guests
+    )
 
     flash(f"Booking request received for {room_name}. We will contact you at {email}.")
     return redirect(url_for("home") + "#booking")
