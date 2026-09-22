@@ -58,7 +58,8 @@ def send_booking_email(guest_name, guest_email, room_name, check_in, check_out, 
         data=data,
         headers={
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Moscow-hotel/1.0"
         },
         method="POST"
     )
