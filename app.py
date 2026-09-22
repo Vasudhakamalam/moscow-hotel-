@@ -1,7 +1,8 @@
 import os
 import sqlite3
-import smtplib
-from email.message import EmailMessage
+import json
+import urllib.request
+import urllib.error
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -17,49 +18,62 @@ DB_PATH = BASE_DIR / "moscow_hotel.db"
 # Demo defaults. For deployment, set ADMIN_USERNAME, ADMIN_PASSWORD and SECRET_KEY
 # as environment variables on your hosting platform.
 def send_booking_email(guest_name, guest_email, room_name, check_in, check_out, guests):
-    """Send an automatic booking confirmation/welcome email."""
-    mail_server = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
-    mail_port = int(os.environ.get("MAIL_PORT", "587"))
-    mail_username = os.environ.get("MAIL_USERNAME")
-    mail_password = os.environ.get("MAIL_PASSWORD")
+    """Send an automatic booking confirmation email using Resend."""
 
-    if not mail_username or not mail_password:
-        print("Email settings are not configured.")
+    api_key = os.environ.get("RESEND_API_KEY")
+
+    if not api_key:
+        print("RESEND_API_KEY is not configured.")
         return
 
-    message = EmailMessage()
-    message["Subject"] = f"Welcome to Moscow Hotel, {guest_name}!"
-    message["From"] = mail_username
-    message["To"] = guest_email
+    email_data = {
+        "from": "Moscow Hotel <onboarding@resend.dev>",
+        "to": [guest_email],
+        "subject": f"Welcome to Moscow Hotel, {guest_name}!",
+        "html": f"""
+        <h2>Welcome to Moscow Hotel, {guest_name}!</h2>
 
-    message.set_content(f"""
-Dear {guest_name},
+        <p>Thank you for booking your stay with <strong>Moscow Hotel, Madurai</strong>.</p>
 
-Thank you for booking your stay with Moscow Hotel, Madurai!
+        <h3>Your Booking Details</h3>
 
-Your booking details:
+        <p><strong>Room:</strong> {room_name}</p>
+        <p><strong>Check-in:</strong> {check_in}</p>
+        <p><strong>Check-out:</strong> {check_out}</p>
+        <p><strong>Guests:</strong> {guests}</p>
 
-Room: {room_name}
-Check-in: {check_in}
-Check-out: {check_out}
-Guests: {guests}
+        <p>We are happy to welcome you and look forward to your stay.</p>
 
-We are happy to welcome you and look forward to your stay.
+        <p>
+        Warm regards,<br>
+        <strong>Moscow Hotel Team</strong>
+        </p>
+        """
+    }
 
-Warm regards,
-Moscow Hotel Team
-""")
+    data = json.dumps(email_data).encode("utf-8")
+
+    request = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
 
     try:
-        with smtplib.SMTP(mail_server, mail_port) as server:
-            server.starttls()
-            server.login(mail_username, mail_password)
-            server.send_message(message)
+        with urllib.request.urlopen(request) as response:
+            result = response.read().decode("utf-8")
+            print("Booking email sent successfully:", result)
 
-        print(f"Booking email sent successfully to {guest_email}")
+    except urllib.error.HTTPError as error:
+        error_message = error.read().decode("utf-8")
+        print("Resend email error:", error_message)
 
     except Exception as error:
-        print(f"Could not send booking email: {error}")
+        print("Could not send booking email:", error)
 
 ROOMS = [
     {"id": 1, "name": "Deluxe Room", "price": 4500, "image": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&q=80", "description": "Elegant room with a king bed, workspace and city view."},
