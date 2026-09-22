@@ -1,4 +1,5 @@
 import os
+import resend
 import sqlite3
 import json
 import urllib.request
@@ -26,14 +27,19 @@ def send_booking_email(guest_name, guest_email, room_name, check_in, check_out, 
         print("RESEND_API_KEY is not configured.")
         return
 
-    email_data = {
+    resend.api_key = api_key
+
+    params = {
         "from": "Moscow Hotel <onboarding@resend.dev>",
         "to": [guest_email],
         "subject": f"Welcome to Moscow Hotel, {guest_name}!",
         "html": f"""
         <h2>Welcome to Moscow Hotel, {guest_name}!</h2>
 
-        <p>Thank you for booking your stay with <strong>Moscow Hotel, Madurai</strong>.</p>
+        <p>
+            Thank you for booking your stay with
+            <strong>Moscow Hotel, Madurai</strong>.
+        </p>
 
         <h3>Your Booking Details</h3>
 
@@ -42,39 +48,23 @@ def send_booking_email(guest_name, guest_email, room_name, check_in, check_out, 
         <p><strong>Check-out:</strong> {check_out}</p>
         <p><strong>Guests:</strong> {guests}</p>
 
-        <p>We are happy to welcome you and look forward to your stay.</p>
+        <p>
+            We are happy to welcome you and look forward to your stay.
+        </p>
 
         <p>
-        Warm regards,<br>
-        <strong>Moscow Hotel Team</strong>
+            Warm regards,<br>
+            <strong>Moscow Hotel Team</strong>
         </p>
         """
     }
 
-    data = json.dumps(email_data).encode("utf-8")
-
-    request = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=data,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "Moscow-hotel/1.0"
-        },
-        method="POST"
-    )
-
     try:
-        with urllib.request.urlopen(request) as response:
-            result = response.read().decode("utf-8")
-            print("Booking email sent successfully:", result)
-
-    except urllib.error.HTTPError as error:
-        error_message = error.read().decode("utf-8")
-        print("Resend email error:", error_message)
+        email = resend.Emails.send(params)
+        print("Booking email sent successfully:", email)
 
     except Exception as error:
-        print("Could not send booking email:", error)
+        print("Resend email error:", error)
 
 ROOMS = [
     {"id": 1, "name": "Deluxe Room", "price": 4500, "image": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&q=80", "description": "Elegant room with a king bed, workspace and city view."},
