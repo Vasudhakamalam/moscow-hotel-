@@ -269,6 +269,24 @@ def admin_dashboard():
         checkins_today=checkins_today,
         upcoming=upcoming,
     )
+@app.route("/admin/customers")
+@admin_required
+def admin_customers():
+    conn = get_db()
+
+    customers = conn.execute("""
+        SELECT *
+        FROM customers
+        ORDER BY updated_at DESC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "customers.html",
+        customers=customers
+    )
+    
 
 # Backward-compatible route, but now protected.
 @app.route("/bookings")
