@@ -12,6 +12,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "change-this-secret-key-in-production")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Moscow@123")
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "moscow_hotel.db"
