@@ -175,9 +175,46 @@ def book():
         (guest_name, email, phone, room_name, check_in, check_out, guests,
          datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
+        # Add or update customer in CRM
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    conn.execute("""
+        INSERT INTO customers (
+            guest_name,
+            email,
+            phone,
+            total_bookings,
+            last_room,
+            last_check_in,
+            last_check_out,
+            created_at,
+            updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET
+            guest_name = excluded.guest_name,
+            phone = excluded.phone,
+            total_bookings = customers.total_bookings + 1,
+            last_room = excluded.last_room,
+            last_check_in = excluded.last_check_in,
+            last_check_out = excluded.last_check_out,
+            updated_at = excluded.updated_at
+    """, (
+        guest_name,
+        email,
+        phone,
+        1,
+        room_name,
+        check_in,
+        check_out,
+        now,
+        now
+    ))
+
     conn.commit()
     conn.close()
 
+    # Automatically send a personalized welcome email
     # Automatically send a personalized welcome email
     send_booking_email(
         guest_name,
