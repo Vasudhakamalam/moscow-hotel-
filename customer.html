@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Moscow Hotel - Customers</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+        }
+
+        .header {
+            background: #222;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f0f1f5;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .count {
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🏨 Moscow Hotel — CRM</h1>
+        <a href="/admin" style="color:white; text-decoration:none;">
+            ← Dashboard
+        </a>
+    </div>
+
+    <div class="container">
+
+        <a href="/admin" class="back">← Back to Dashboard</a>
+
+        <div class="card">
+
+            <h2>Customer Management</h2>
+
+            <p class="count">
+                Total Customers: <strong>{{ customers|length }}</strong>
+            </p>
+
+            {% if customers %}
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Total Bookings</th>
+                        <th>Last Room</th>
+                        <th>Last Check-in</th>
+                        <th>Last Check-out</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for customer in customers %}
+
+                    <tr>
+                        <td>{{ customer["guest_name"] }}</td>
+                        <td>{{ customer["email"] }}</td>
+                        <td>{{ customer["phone"] }}</td>
+                        <td>{{ customer["total_bookings"] }}</td>
+                        <td>{{ customer["last_room"] }}</td>
+                        <td>{{ customer["last_check_in"] }}</td>
+                        <td>{{ customer["last_check_out"] }}</td>
+                        <td>{{ customer["updated_at"] }}</td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty">
+                <h3>No customers yet</h3>
+                <p>Customers will appear here automatically after they make a booking.</p>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+</html>
